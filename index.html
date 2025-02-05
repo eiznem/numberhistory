@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoApps Lookup Tool</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 VoApps Lookup Tool</h1>
+        <form id="lookupForm">
+            <label for="apiKey">API Key:</label>
+            <input type="text" id="apiKey" placeholder="Enter your API key" required>
+
+            <label for="phoneNumbers">Phone Numbers (comma-separated):</label>
+            <textarea id="phoneNumbers" rows="4" placeholder="e.g., 4353137000,9519532629" required></textarea>
+
+            <button type="submit">Generate Report</button>
+        </form>
+
+        <div id="results"></div>
+        <button id="downloadBtn" style="display:none;">Download CSV</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
