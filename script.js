@@ -1,21 +1,22 @@
-// ✅ Temporary CORS Proxy (for testing only)
-const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+const PROXY_URL = 'https://voapps-cors-proxy.onrender.com/proxy';
 
 async function fetchAccounts(apiKey) {
   try {
-    const response = await fetch(`${CORS_PROXY}https://directdropvoicemail.voapps.com/api/v1/accounts`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`
-      }
+    const response = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: 'https://directdropvoicemail.voapps.com/api/v1/accounts',
+        apiKey: apiKey
+      })
     });
 
     if (!response.ok) {
-      throw new Error(`❌ API Error: ${response.status} ${response.statusText}`);
+      throw new Error(`❌ Proxy Error: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log("✅ Accounts fetched successfully:", data);
+    console.log("✅ Accounts fetched:", data);
     return data.accounts || [];
   } catch (error) {
     console.error(`❌ Error: ${error.message}`);
@@ -23,6 +24,7 @@ async function fetchAccounts(apiKey) {
     return [];
   }
 }
+
 
 document.getElementById('lookupForm').addEventListener('submit', async function(event) {
     event.preventDefault();
