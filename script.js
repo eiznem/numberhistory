@@ -1,4 +1,4 @@
-const PROXY_URL = 'https://voapps-cors-proxy.onrender.com/proxy';
+const PROXY_URL = 'https://numberhistory.onrender.com/proxy';
 
 async function fetchAccounts(apiKey) {
   try {
