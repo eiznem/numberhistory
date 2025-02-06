@@ -5,21 +5,18 @@ import cors from 'cors';
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// ✅ Ensure CORS settings allow GitHub Pages
 app.use(cors({
-    origin: '*', // TEMP: Allow all origins for debugging
+    origin: 'https://eiznem.github.io',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
 
-// ✅ Root route to confirm the server is running
 app.get('/', (req, res) => {
     res.send('✅ VoApps CORS Proxy is running!');
 });
 
-// ✅ Proxy route
 app.post('/proxy', async (req, res) => {
     const { url, apiKey, method = 'GET', body = null } = req.body;
 
@@ -35,10 +32,18 @@ app.post('/proxy', async (req, res) => {
             body: body ? JSON.stringify(body) : undefined
         });
 
-        const data = await response.json();
-        console.log('✅ Response from API:', data);
-        res.setHeader('Access-Control-Allow-Origin', '*'); // TEMP: Add explicit CORS header
-        res.json(data);
+        const contentType = response.headers.get('content-type');
+
+        // ✅ Check if the response is JSON or CSV
+        if (contentType && contentType.includes('application/json')) {
+            const data = await response.json();
+            console.log('✅ JSON Response from API:', data);
+            res.json(data);
+        } else {
+            const text = await response.text();
+            console.log('✅ CSV Response received.');
+            res.send(text);  // ✅ Send CSV as plain text
+        }
     } catch (error) {
         console.error('❌ Proxy Error:', error.message);
         res.status(500).json({ error: 'Proxy request failed', details: error.message });
