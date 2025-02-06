@@ -26,7 +26,7 @@ document.getElementById('lookupForm').addEventListener('submit', async function(
                 totalCampaignsProcessed++;
                 logMessage(`📦 Processing campaign: ${campaign.name}`, resultsContainer);
 
-                const campaignResults = await fetchCampaignResults(campaign.export);
+                const campaignResults = await fetchCampaignResults(campaign.export, apiKey);
 
                 for (const result of campaignResults) {
                     const number = (result.number || result.phone_number || '').replace(/\D/g, '').replace(/^1/, '');
@@ -70,16 +70,29 @@ async function fetchAccounts(apiKey) {
 }
 
 async function fetchCampaigns(accountId, apiKey) {
-    const response = await fetch(`https://directdropvoicemail.voapps.com/api/v1/accounts/${accountId}/campaigns`, {
-        headers: { 'Authorization': `Bearer ${apiKey}` }
+    const response = await fetch('https://numberhistory.onrender.com/proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            url: `https://directdropvoicemail.voapps.com/api/v1/accounts/${accountId}/campaigns`,
+            apiKey: apiKey
+        })
     });
 
     const data = await response.json();
     return data.campaigns || [];
 }
 
-async function fetchCampaignResults(exportUrl) {
-    const response = await fetch(exportUrl);
+async function fetchCampaignResults(exportUrl, apiKey) {
+    const response = await fetch('https://numberhistory.onrender.com/proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            url: exportUrl,
+            apiKey: apiKey
+        })
+    });
+
     const text = await response.text();
     const rows = text.split('\n').map(row => row.split(','));
     const headers = rows[0];
