@@ -14,6 +14,8 @@ app.post('/proxy', async (req, res) => {
   const { url, apiKey, method = 'GET', body = null } = req.body;
 
   try {
+    console.log(`🔗 Sending request to: ${url}`);  // Log the target URL
+
     const response = await fetch(url, {
       method,
       headers: {
@@ -24,12 +26,15 @@ app.post('/proxy', async (req, res) => {
     });
 
     const data = await response.json();
+    console.log('✅ Response from API:', data);  // Log API response
     res.json(data);
+
   } catch (error) {
-    console.error('Proxy Error:', error);
-    res.status(500).json({ error: 'Proxy request failed' });
+    console.error('❌ Proxy Error:', error.message);  // Log the actual error
+    res.status(500).json({ error: 'Proxy request failed', details: error.message });
   }
 });
+
 
 app.get('/', (req, res) => {
   res.send('✅ VoApps CORS Proxy is running!');
