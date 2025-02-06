@@ -5,6 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VoApps Lookup Tool</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: white;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #3F2FB8;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #3F2FB8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #5c4ac7;
+        }
+
+        #results {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #3F2FB8;
+            color: white;
+        }
+
+        #downloadBtn {
+            display: none;
+            background-color: #FF4B7D;
+        }
+
+        #downloadBtn:hover {
+            background-color: #d93c6c;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -12,13 +93,17 @@
         <form id="lookupForm">
             <label for="apiKey">API Key:</label>
             <input type="text" id="apiKey" placeholder="Enter your API key" required>
+
             <label for="phoneNumbers">Phone Numbers (comma-separated):</label>
             <textarea id="phoneNumbers" rows="4" placeholder="e.g., 4353137000,9519532629" required></textarea>
+
             <button type="submit">Generate Report</button>
         </form>
+
         <div id="results"></div>
-        <button id="downloadBtn" style="display:none;">Download CSV</button>
+        <button id="downloadBtn">Download CSV</button>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
