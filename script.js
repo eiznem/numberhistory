@@ -1,6 +1,4 @@
-const PROXY_URL = 'https://numberhistory.onrender.com/proxy';
-
-document.getElementById('lookupForm').addEventListener('submit', async function (event) {
+document.getElementById('lookupForm').addEventListener('submit', async function(event) {
     event.preventDefault();
 
     const apiKey = document.getElementById('apiKey').value.trim();
@@ -9,18 +7,30 @@ document.getElementById('lookupForm').addEventListener('submit', async function 
         .split(',')
         .map(num => num.replace(/\D/g, '').replace(/^1/, ''));
 
-    const startDate = new Date();
-    startDate.setMonth(startDate.getMonth() - 6); // ✅ Past 6 months
-    const endDate = new Date();
-
     document.getElementById('results').innerHTML = "⏳ Fetching data...";
 
     try {
-        const accounts = await fetchAccounts(apiKey);
-        let results = [];
+        const response = await fetch('https://numberhistory.onrender.com/proxy', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                url: 'https://directdropvoicemail.voapps.com/api/v1/accounts',
+                apiKey: apiKey
+            })
+        });
 
+        if (!response.ok) {
+            throw new Error(`❌ Proxy Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const accounts = data.accounts || [];
+
+        let results = [];
         for (const account of accounts) {
-            const campaigns = await fetchCampaigns(account.id, apiKey, startDate, endDate);
+            const campaigns = await fetchCampaigns(account.id, apiKey);
 
             for (const campaign of campaigns) {
                 const campaignResults = await fetchCampaignResults(campaign.export);
@@ -49,40 +59,11 @@ document.getElementById('lookupForm').addEventListener('submit', async function 
     }
 });
 
-async function fetchAccounts(apiKey) {
+async function fetchCampaigns(accountId, apiKey) {
     try {
-        const response = await fetch(PROXY_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                url: 'https://directdropvoicemail.voapps.com/api/v1/accounts',
-                apiKey: apiKey
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`❌ Proxy Error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("✅ Accounts fetched:", data);
-        return data.accounts || [];
-    } catch (error) {
-        console.error(`❌ Error: ${error.message}`);
-        alert(`❌ Error: ${error.message}`);
-        return [];
-    }
-}
-
-async function fetchCampaigns(accountId, apiKey, startDate, endDate) {
-    const formattedStartDate = startDate.toISOString().split('T')[0];
-    const formattedEndDate = endDate.toISOString().split('T')[0];
-
-    try {
-        const response = await fetch(`https://directdropvoicemail.voapps.com/api/v1/accounts/${accountId}/campaigns?created_date=${formattedStartDate}&end_date=${formattedEndDate}`, {
+        const response = await fetch(`https://directdropvoicemail.voapps.com/api/v1/accounts/${accountId}/campaigns`, {
             headers: { 'Authorization': `Bearer ${apiKey}` }
         });
-
         const data = await response.json();
         return data.campaigns || [];
     } catch (error) {
