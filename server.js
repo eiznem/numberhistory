@@ -31,6 +31,10 @@ app.post('/proxy', async (req, res) => {
   }
 });
 
+app.get('/', (req, res) => {
+  res.send('✅ VoApps CORS Proxy is running!');
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 CORS Proxy Server running on http://localhost:${PORT}`);
 });
