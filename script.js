@@ -74,12 +74,8 @@ async function fetchCampaigns(accountId, apiKey) {
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(today.getMonth() - 6);
 
-    const startDate = sixMonthsAgo.toISOString().split('T')[0];
-    const endDate = today.toISOString().split('T')[0];
-
     let campaigns = [];
 
-    // Fetch campaigns for each day in the date range
     for (let date = new Date(sixMonthsAgo); date <= today; date.setDate(date.getDate() + 1)) {
         const formattedDate = date.toISOString().split('T')[0];
 
@@ -99,10 +95,6 @@ async function fetchCampaigns(accountId, apiKey) {
     }
 
     return campaigns;
-}
-
-    const data = await response.json();
-    return data.campaigns || [];
 }
 
 async function fetchCampaignResults(exportUrl, apiKey) {
@@ -181,4 +173,3 @@ function logMessage(message, container, isError = false) {
     container.appendChild(logEntry);
     container.scrollTop = container.scrollHeight; // Auto-scroll
 }
-
