@@ -70,14 +70,38 @@ async function fetchAccounts(apiKey) {
 }
 
 async function fetchCampaigns(accountId, apiKey) {
-    const response = await fetch('https://numberhistory.onrender.com/proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            url: `https://directdropvoicemail.voapps.com/api/v1/accounts/${accountId}/campaigns`,
-            apiKey: apiKey
-        })
-    });
+    const today = new Date();
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(today.getMonth() - 6);
+
+    const startDate = sixMonthsAgo.toISOString().split('T')[0];
+    const endDate = today.toISOString().split('T')[0];
+
+    let campaigns = [];
+
+    // Fetch campaigns for each day in the date range
+    for (let date = new Date(sixMonthsAgo); date <= today; date.setDate(date.getDate() + 1)) {
+        const formattedDate = date.toISOString().split('T')[0];
+
+        const response = await fetch('https://numberhistory.onrender.com/proxy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                url: `https://directdropvoicemail.voapps.com/api/v1/accounts/${accountId}/campaigns?created_date=${formattedDate}`,
+                apiKey: apiKey
+            })
+        });
+
+        const data = await response.json();
+        if (data.campaigns && data.campaigns.length) {
+            campaigns = campaigns.concat(data.campaigns);
+        }
+    }
+
+    return campaigns;
+} 
+
+
 
     const data = await response.json();
     return data.campaigns || [];
