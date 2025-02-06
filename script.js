@@ -27,6 +27,7 @@ document.getElementById('lookupForm').addEventListener('submit', async function(
                 logMessage(`📦 Processing campaign: ${campaign.name}`, resultsContainer);
 
                 const campaignResults = await fetchCampaignResults(campaign.export, apiKey);
+                logMessage(`✅ Fetched ${campaignResults.length} results from campaign: ${campaign.name}`, resultsContainer);
 
                 for (const result of campaignResults) {
                     const number = (result.number || result.phone_number || '').replace(/\D/g, '').replace(/^1/, '');
@@ -71,12 +72,12 @@ async function fetchAccounts(apiKey) {
 
 async function fetchCampaigns(accountId, apiKey) {
     const today = new Date();
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(today.getMonth() - 6);
+    const startDate = new Date();
+    startDate.setMonth(today.getMonth() - 1);
 
     let campaigns = [];
 
-    for (let date = new Date(sixMonthsAgo); date <= today; date.setDate(date.getDate() + 1)) {
+    for (let date = new Date(startDate); date <= today; date.setDate(date.getDate() + 1)) {
         const formattedDate = date.toISOString().split('T')[0];
 
         const response = await fetch('https://numberhistory.onrender.com/proxy', {
@@ -111,9 +112,12 @@ async function fetchCampaignResults(exportUrl, apiKey) {
     const rows = text.split('\n').map(row => row.split(','));
     const headers = rows[0];
 
-    return rows.slice(1).map(row =>
+    const results = rows.slice(1).map(row =>
         Object.fromEntries(headers.map((header, index) => [header, row[index]]))
     );
+
+    console.log(`✅ Parsed ${results.length} results from CSV.`);
+    return results;
 }
 
 function displayResults(results) {
@@ -165,11 +169,10 @@ function downloadCSV(results) {
     document.body.removeChild(link);
 }
 
-// ✅ Real-time Log Function
 function logMessage(message, container, isError = false) {
     const logEntry = document.createElement('div');
     logEntry.style.color = isError ? 'red' : 'black';
     logEntry.innerHTML = message;
     container.appendChild(logEntry);
-    container.scrollTop = container.scrollHeight; // Auto-scroll
-}
+    container.scrollTop = container.scrollHeight;
+} 
