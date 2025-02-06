@@ -10,25 +10,9 @@ document.getElementById('lookupForm').addEventListener('submit', async function(
     document.getElementById('results').innerHTML = "⏳ Fetching data...";
 
     try {
-        const response = await fetch('https://numberhistory.onrender.com/proxy', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                url: 'https://directdropvoicemail.voapps.com/api/v1/accounts',
-                apiKey: apiKey
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`❌ Proxy Error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const accounts = data.accounts || [];
-
+        const accounts = await fetchAccounts(apiKey);
         let results = [];
+
         for (const account of accounts) {
             const campaigns = await fetchCampaigns(account.id, apiKey);
 
@@ -59,33 +43,38 @@ document.getElementById('lookupForm').addEventListener('submit', async function(
     }
 });
 
+async function fetchAccounts(apiKey) {
+    const response = await fetch('https://numberhistory.onrender.com/proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            url: 'https://directdropvoicemail.voapps.com/api/v1/accounts',
+            apiKey: apiKey
+        })
+    });
+
+    const data = await response.json();
+    return data.accounts || [];
+}
+
 async function fetchCampaigns(accountId, apiKey) {
-    try {
-        const response = await fetch(`https://directdropvoicemail.voapps.com/api/v1/accounts/${accountId}/campaigns`, {
-            headers: { 'Authorization': `Bearer ${apiKey}` }
-        });
-        const data = await response.json();
-        return data.campaigns || [];
-    } catch (error) {
-        console.error(`❌ Error fetching campaigns: ${error.message}`);
-        return [];
-    }
+    const response = await fetch(`https://directdropvoicemail.voapps.com/api/v1/accounts/${accountId}/campaigns`, {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+    });
+
+    const data = await response.json();
+    return data.campaigns || [];
 }
 
 async function fetchCampaignResults(exportUrl) {
-    try {
-        const response = await fetch(exportUrl);
-        const text = await response.text();
-        const rows = text.split('\n').map(row => row.split(','));
-        const headers = rows[0];
+    const response = await fetch(exportUrl);
+    const text = await response.text();
+    const rows = text.split('\n').map(row => row.split(','));
+    const headers = rows[0];
 
-        return rows.slice(1).map(row =>
-            Object.fromEntries(headers.map((header, index) => [header, row[index]]))
-        );
-    } catch (error) {
-        console.error(`❌ Error fetching campaign results: ${error.message}`);
-        return [];
-    }
+    return rows.slice(1).map(row =>
+        Object.fromEntries(headers.map((header, index) => [header, row[index]]))
+    );
 }
 
 function displayResults(results) {
