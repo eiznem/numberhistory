@@ -181,3 +181,4 @@ function logMessage(message, container, isError = false) {
     container.appendChild(logEntry);
     container.scrollTop = container.scrollHeight; // Auto-scroll
 }
+
