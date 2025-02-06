@@ -7,16 +7,24 @@ document.getElementById('lookupForm').addEventListener('submit', async function(
         .split(',')
         .map(num => num.replace(/\D/g, '').replace(/^1/, ''));
 
-    document.getElementById('results').innerHTML = "⏳ Fetching data...";
+    const resultsContainer = document.getElementById('results');
+    resultsContainer.innerHTML = "✅ Request submitted. Starting data retrieval...";
 
     try {
         const accounts = await fetchAccounts(apiKey);
+        resultsContainer.innerHTML += `<br>📊 Retrieved ${accounts.length} accounts.`;
+
         let results = [];
+        let totalCampaignsProcessed = 0;
 
         for (const account of accounts) {
             const campaigns = await fetchCampaigns(account.id, apiKey);
+            resultsContainer.innerHTML += `<br>🔍 Found ${campaigns.length} campaigns for account: ${account.name}`;
 
             for (const campaign of campaigns) {
+                totalCampaignsProcessed++;
+                resultsContainer.innerHTML += `<br>📦 Processing campaign: ${campaign.name}`;
+
                 const campaignResults = await fetchCampaignResults(campaign.export);
 
                 for (const result of campaignResults) {
@@ -34,12 +42,14 @@ document.getElementById('lookupForm').addEventListener('submit', async function(
                         });
                     }
                 }
+
+                resultsContainer.innerHTML += `<br>✅ Processed ${totalCampaignsProcessed} campaigns so far.`;
             }
         }
 
         displayResults(results);
     } catch (error) {
-        document.getElementById('results').innerHTML = `❌ Error: ${error.message}`;
+        resultsContainer.innerHTML += `<br>❌ Error: ${error.message}`;
     }
 });
 
@@ -81,7 +91,7 @@ function displayResults(results) {
     const resultsContainer = document.getElementById('results');
 
     if (results.length === 0) {
-        resultsContainer.innerHTML = "❌ No matches found.";
+        resultsContainer.innerHTML += "<br>❌ No matches found.";
         return;
     }
 
@@ -104,7 +114,7 @@ function displayResults(results) {
     });
 
     table += `</table>`;
-    resultsContainer.innerHTML = table;
+    resultsContainer.innerHTML += table;
 
     const downloadBtn = document.getElementById('downloadBtn');
     downloadBtn.style.display = 'block';
