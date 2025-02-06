@@ -5,9 +5,9 @@ import cors from 'cors';
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// ✅ Enable CORS for GitHub Pages
+// ✅ Ensure CORS settings allow GitHub Pages
 app.use(cors({
-    origin: 'https://eiznem.github.io',  // Allow requests from GitHub Pages
+    origin: '*', // TEMP: Allow all origins for debugging
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -37,6 +37,7 @@ app.post('/proxy', async (req, res) => {
 
         const data = await response.json();
         console.log('✅ Response from API:', data);
+        res.setHeader('Access-Control-Allow-Origin', '*'); // TEMP: Add explicit CORS header
         res.json(data);
     } catch (error) {
         console.error('❌ Proxy Error:', error.message);
@@ -44,7 +45,6 @@ app.post('/proxy', async (req, res) => {
     }
 });
 
-// ✅ Start the server
 app.listen(PORT, () => {
     console.log(`🚀 CORS Proxy Server running on http://localhost:${PORT}`);
 });
