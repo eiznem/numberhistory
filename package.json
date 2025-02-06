@@ -1,6 +1,7 @@
 {
   "name": "numberhistory",
   "version": "1.0.0",
+  "type": "module",  // 👈 Add this line to support ES modules
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
