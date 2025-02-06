@@ -26,6 +26,7 @@ async function fetchAccounts(apiKey) {
 }
 
 
+
 document.getElementById('lookupForm').addEventListener('submit', async function(event) {
     event.preventDefault();
 
