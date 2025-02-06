@@ -99,9 +99,7 @@ async function fetchCampaigns(accountId, apiKey) {
     }
 
     return campaigns;
-} 
-
-
+}
 
     const data = await response.json();
     return data.campaigns || [];
