@@ -8,22 +8,23 @@ document.getElementById('lookupForm').addEventListener('submit', async function(
         .map(num => num.replace(/\D/g, '').replace(/^1/, ''));
 
     const resultsContainer = document.getElementById('results');
-    resultsContainer.innerHTML = "✅ Request submitted. Starting data retrieval...";
+    resultsContainer.innerHTML = "✅ Request submitted. Starting data retrieval...<br>";
+    resultsContainer.scrollTop = resultsContainer.scrollHeight;
 
     try {
         const accounts = await fetchAccounts(apiKey);
-        resultsContainer.innerHTML += `<br>📊 Retrieved ${accounts.length} accounts.`;
+        logMessage(`📊 Retrieved ${accounts.length} accounts.`, resultsContainer);
 
         let results = [];
         let totalCampaignsProcessed = 0;
 
         for (const account of accounts) {
             const campaigns = await fetchCampaigns(account.id, apiKey);
-            resultsContainer.innerHTML += `<br>🔍 Found ${campaigns.length} campaigns for account: ${account.name}`;
+            logMessage(`🔍 Found ${campaigns.length} campaigns for account: ${account.name}`, resultsContainer);
 
             for (const campaign of campaigns) {
                 totalCampaignsProcessed++;
-                resultsContainer.innerHTML += `<br>📦 Processing campaign: ${campaign.name}`;
+                logMessage(`📦 Processing campaign: ${campaign.name}`, resultsContainer);
 
                 const campaignResults = await fetchCampaignResults(campaign.export);
 
@@ -40,16 +41,17 @@ document.getElementById('lookupForm').addEventListener('submit', async function(
                             voapps_code: result.voapps_code || '',
                             voapps_timestamp: result.voapps_timestamp || ''
                         });
+                        logMessage(`✅ Match found for number: ${number}`, resultsContainer);
                     }
                 }
 
-                resultsContainer.innerHTML += `<br>✅ Processed ${totalCampaignsProcessed} campaigns so far.`;
+                logMessage(`✅ Processed ${totalCampaignsProcessed} campaigns so far.`, resultsContainer);
             }
         }
 
         displayResults(results);
     } catch (error) {
-        resultsContainer.innerHTML += `<br>❌ Error: ${error.message}`;
+        logMessage(`❌ Error: ${error.message}`, resultsContainer, true);
     }
 });
 
@@ -91,7 +93,7 @@ function displayResults(results) {
     const resultsContainer = document.getElementById('results');
 
     if (results.length === 0) {
-        resultsContainer.innerHTML += "<br>❌ No matches found.";
+        logMessage("❌ No matches found.", resultsContainer, true);
         return;
     }
 
@@ -134,4 +136,13 @@ function downloadCSV(results) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+// ✅ Real-time Log Function
+function logMessage(message, container, isError = false) {
+    const logEntry = document.createElement('div');
+    logEntry.style.color = isError ? 'red' : 'black';
+    logEntry.innerHTML = message;
+    container.appendChild(logEntry);
+    container.scrollTop = container.scrollHeight; // Auto-scroll
 }
